@@ -17,6 +17,10 @@ mid_height = 300
 screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 on_start_screen = True
 
+#paddle access
+right = False
+left = True
+
 #creating font
 font = pygame.font.SysFont('comicsans', 32)
 
@@ -43,6 +47,20 @@ class Ball:
         self.y+= self.vel*self.dirY
         self.draw(screen)
 
+#Paddel Class
+class Paddle:
+    def __init__(self, x, y, width, height, color):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.color = color
+        self.vel = 7
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height))
+
+
 
 #diffferent screens
 def start_screen():
@@ -52,11 +70,15 @@ def start_screen():
 
 def mainPlayground():
     ball.move(screen)
+    paddleLeft.draw(screen)
+    paddleRight.draw(screen)
     pygame.display.update()
 
 
 #gameloop
 ball = Ball(mid_width - 10, mid_height -10, (255, 0, 0), 25)
+paddleLeft = Paddle(0, 30, 20, 120, (255, 255, 255))
+paddleRight = Paddle(WIN_WIDTH-20, 300, 20, 120, (255, 255, 255))
 
 running = True
 while running:
@@ -70,6 +92,30 @@ while running:
 
     #key press event
     keys = pygame.key.get_pressed()
+
+    #check if ball crosses the half width of window
+    if ball.dirX >0:
+        right = True
+        left = False
+    else:
+        left = True
+        right = False
+
+    #move the paddle
+    if keys[pygame.K_UP]:
+        if right:
+            paddle = paddleRight
+        else:
+            paddle = paddleLeft
+        paddle.y -= paddle.vel
+
+    if keys[pygame.K_DOWN]:
+        if right:
+            paddle = paddleRight
+        else:
+            paddle = paddleLeft
+        paddle.y += paddle.vel
+
 
     screen.fill((0, 0, 0))
     if on_start_screen:
