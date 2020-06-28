@@ -70,7 +70,7 @@ class Paddle:
 #diffferent screens
 def start_screen():
     start = font.render("Press Enter key to Start", 1, (0, 240, 0))
-    screen.blit(start, (mid_width - 30, mid_height-16))
+    screen.blit(start, (mid_width - 100, mid_height-16))
     pygame.display.update()
 
 def mainPlayground():
