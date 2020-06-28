@@ -17,10 +17,15 @@ mid_height = 300
 screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 on_start_screen = True
 
+#load Image
+paddle_left_img = pygame.image.load('leftPaddle.png')
+paddle_right_img = pygame.image.load('RightPaddle.png')
+
 #paddle access
 right = False
 left = True
 score = 0
+val = 0
 
 #creating font
 font = pygame.font.SysFont('comicsans', 32)
@@ -32,10 +37,10 @@ class Ball:
         self.y = y
         self.radius = radius
         self.color = color
-        self.vel = 5
+        self.vel = 8
         self.dirX = 1
         self.dirY = 1
-    
+
     def draw(self, screen):
         pygame.draw.circle(screen, (255, 0, 0), (self.x, self.y), self.radius)
 
@@ -48,16 +53,17 @@ class Ball:
 
 #Paddel Class
 class Paddle:
-    def __init__(self, x, y, width, height, color):
+    def __init__(self, x, y, width, height, color, img):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
         self.color = color
-        self.vel = 7
-
+        self.vel = 10
+        self.img = img
+    
     def draw(self, screen):
-        pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height))
+        screen.blit(self.img, (self.x, self.y))
 
 
 
@@ -85,11 +91,12 @@ def collision():
     paddleLeft.y = 30
     paddleRight.y = 300
     score = 0
+    ball.vel = 8
 
 #gameloop
 ball = Ball(mid_width - 10, mid_height -10, (255, 0, 0), 25)
-paddleLeft = Paddle(0, 30, 20, 120, (255, 255, 255))
-paddleRight = Paddle(WIN_WIDTH-20, 300, 20, 120, (255, 255, 255))
+paddleLeft = Paddle(0, 30, 20, 120, (255, 255, 255), paddle_left_img)
+paddleRight = Paddle(WIN_WIDTH-20, 300, 20, 120, (255, 255, 255), paddle_right_img)
 
 running = True
 while running:
@@ -103,6 +110,10 @@ while running:
 
     #key press event
     keys = pygame.key.get_pressed()
+
+    if score > 10 * val:
+        val +=1
+        ball.vel+=2
 
     #check if ball crosses the half width of window
     if ball.dirX >0:
@@ -133,13 +144,13 @@ while running:
 
     #check for collision
     if right:
-        if ball.x+ball.radius == paddleRight.x and ball.y- ball.radius > paddleRight.y and ball.y <= paddleRight.y + paddleRight.height:
+        if ball.x+ball.radius >= paddleRight.x and ball.y- (ball.radius) > paddleRight.y and ball.y <= paddleRight.y + paddleRight.height:
             ball.dirX = ball.dirX*-1
             score +=1
         elif ball.x+ball.radius > WIN_WIDTH or ball.x - ball.radius <0:
             collision()
     else:
-        if ball.x-ball.radius == paddleLeft.x+paddleLeft.width and ball.y- ball.radius > paddleLeft.y and ball.y<= paddleLeft.y + paddleLeft.height:
+        if ball.x-ball.radius <= paddleLeft.x+paddleLeft.width and ball.y- (ball.radius) > paddleLeft.y and ball.y<= paddleLeft.y + paddleLeft.height:
             ball.dirX = ball.dirX*-1
             score+=1
         elif ball.x+ball.radius > WIN_WIDTH or ball.x - ball.radius <0:
