@@ -20,6 +20,7 @@ on_start_screen = True
 #paddle access
 right = False
 left = True
+score = 0
 
 #creating font
 font = pygame.font.SysFont('comicsans', 32)
@@ -39,9 +40,7 @@ class Ball:
         pygame.draw.circle(screen, (255, 0, 0), (self.x, self.y), self.radius)
 
     def move(self, screen):
-        if self.x+self.radius > WIN_WIDTH or self.x - self.radius <0:
-            self.dirX = self.dirX*-1
-        elif self.y+self.radius > WIN_HEIGHT or self.y-self.radius<0:
+        if self.y+self.radius > WIN_HEIGHT or self.y-self.radius<0:
             self.dirY = self.dirY*-1
         self.x+= self.vel*self.dirX
         self.y+= self.vel*self.dirY
@@ -69,11 +68,23 @@ def start_screen():
     pygame.display.update()
 
 def mainPlayground():
+    Score = font.render("Score: "+ str(score),1, (255, 200, 100))
+    screen.blit(Score, (0, 0))
     ball.move(screen)
     paddleLeft.draw(screen)
     paddleRight.draw(screen)
     pygame.display.update()
 
+def collision():
+    global on_start_screen, right, left, score, ball, paddleLeft, paddleRight
+    on_start_screen = True
+    right = False
+    left = True
+    ball.x = mid_width - 10
+    ball.y = mid_height - 10
+    paddleLeft.y = 30
+    paddleRight.y = 300
+    score = 0
 
 #gameloop
 ball = Ball(mid_width - 10, mid_height -10, (255, 0, 0), 25)
@@ -107,15 +118,32 @@ while running:
             paddle = paddleRight
         else:
             paddle = paddleLeft
-        paddle.y -= paddle.vel
+        
+        if paddle.y>0:
+            paddle.y -= paddle.vel
 
     if keys[pygame.K_DOWN]:
         if right:
             paddle = paddleRight
         else:
             paddle = paddleLeft
-        paddle.y += paddle.vel
 
+        if paddle.y + paddle.height < WIN_HEIGHT:
+            paddle.y += paddle.vel
+
+    #check for collision
+    if right:
+        if ball.x+ball.radius == paddleRight.x and ball.y- ball.radius > paddleRight.y and ball.y <= paddleRight.y + paddleRight.height:
+            ball.dirX = ball.dirX*-1
+            score +=1
+        elif ball.x+ball.radius > WIN_WIDTH or ball.x - ball.radius <0:
+            collision()
+    else:
+        if ball.x-ball.radius == paddleLeft.x+paddleLeft.width and ball.y- ball.radius > paddleLeft.y and ball.y<= paddleLeft.y + paddleLeft.height:
+            ball.dirX = ball.dirX*-1
+            score+=1
+        elif ball.x+ball.radius > WIN_WIDTH or ball.x - ball.radius <0:
+            collision()
 
     screen.fill((0, 0, 0))
     if on_start_screen:
