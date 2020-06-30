@@ -24,7 +24,7 @@ paddle_right_img = pygame.image.load('RightPaddle.png')
 #paddle access
 right = False
 left = True
-score = 10
+score = 0
 val = 0
 
 #creating font
