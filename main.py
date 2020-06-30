@@ -24,7 +24,7 @@ paddle_right_img = pygame.image.load('RightPaddle.png')
 #paddle access
 right = False
 left = True
-score = 0
+score = 10
 val = 0
 
 #creating font
@@ -59,16 +59,28 @@ class Paddle:
         self.width = width
         self.height = height
         self.color = color
-        self.vel = 10
+        self.vel = 15
         self.img = img
     
     def draw(self, screen):
         screen.blit(self.img, (self.x, self.y))
 
+#Obstacle
+class Obstacle:
+    def __init__(self, x, y, width, height, color):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.color = color
 
+    def draw(self, screen):
+        pygame.draw.rect(screen , self.color,(self.x, self.y, self.width, self.height) )
 
 #diffferent screens
 def start_screen():
+    back_img = pygame.image.load('background.png')
+    screen.blit(back_img, (0, 0))
     start = font.render("Press Enter key to Start", 1, (0, 240, 0))
     screen.blit(start, (mid_width - 100, mid_height-16))
     pygame.display.update()
@@ -76,6 +88,9 @@ def start_screen():
 def mainPlayground():
     Score = font.render("Score: "+ str(score),1, (255, 200, 100))
     screen.blit(Score, (0, 0))
+    if score>10:
+        ball.vel = 12
+        obs.draw(screen)
     ball.move(screen)
     paddleLeft.draw(screen)
     paddleRight.draw(screen)
@@ -97,6 +112,8 @@ def collision():
 ball = Ball(mid_width - 10, mid_height -10, (255, 0, 0), 25)
 paddleLeft = Paddle(0, 30, 20, 120, (255, 255, 255), paddle_left_img)
 paddleRight = Paddle(WIN_WIDTH-20, 300, 20, 120, (255, 255, 255), paddle_right_img)
+obs = Obstacle(mid_width - 20, mid_height - 70, 20, 120, (125, 25, 255))
+
 
 running = True
 while running:
@@ -155,6 +172,12 @@ while running:
             score+=1
         elif ball.x+ball.radius > WIN_WIDTH or ball.x - ball.radius <0:
             collision()
+
+    #check for collision with obstacle
+    if score>10 and ball.y  >= obs.y and ball.y< obs.y + obs.height:
+        paddleRight.vel = paddleLeft.vel = 20
+        if ball.x + ball.radius >= obs.x and ball.x - ball.radius <= obs.x+obs.width:
+            ball.dirX = ball.dirX*-1 
 
     screen.fill((0, 0, 0))
     if on_start_screen:
